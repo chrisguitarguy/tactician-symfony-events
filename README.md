@@ -1,7 +1,8 @@
 # Tactician Symfony Event Middleware
 
-Use the symfony event dispatcher to get notifications when a command is
-received, handle and/or errors.
+Use the [Symfony event dispatcher](http://symfony.com/doc/current/components/event_dispatcher/introduction.html)
+to get notifications when a command is received, handled, and/or errors in 
+[Tactician](http://tactician.thephpleague.com/).
 
 ## Usage
 
