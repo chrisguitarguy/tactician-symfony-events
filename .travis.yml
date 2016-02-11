@@ -4,10 +4,20 @@ php:
     - 5.6
     - 7.0
 
-notifications:
-    on_success: change
-    on_failure: always
+env:
+    matrix:
+        - COMPOSER_FLAGS=""
+        - COMPOSER_FLAGS="--prefer-lowest"
 
-install: composer install
+cache:
+    directories:
+        - $HOME/.composer/cache/files
+
+notifications:
+    email: false
+
+install:
+    - composer self-update
+    - composer update $COMPOSER_FLAGS
 
 script: ./vendor/bin/phpunit
