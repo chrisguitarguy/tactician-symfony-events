@@ -16,17 +16,17 @@ namespace Chrisguitarguy\Tactician\SymfonyEvents;
 final class CommandFailed extends CommandEvent
 {
     /**
-     * @var Exception
+     * @var \Throwable
      */
     private $exception;
 
-    public function __construct($command, \Exception $exception)
+    public function __construct($command, \Throwable $exception)
     {
         parent::__construct($command);
         $this->exception = $exception;
     }
 
-    public function getException()
+    public function getException(): \Throwable
     {
         return $this->exception;
     }

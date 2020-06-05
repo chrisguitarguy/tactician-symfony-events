@@ -15,9 +15,9 @@ namespace Chrisguitarguy\Tactician\SymfonyEvents;
  */
 final class CommandEvents
 {
-    const RECEIVED = 'command.received';
-    const HANDLED = 'command.handled';
-    const FAILED = 'command.failed';
+    public const RECEIVED = 'command.received';
+    public const HANDLED = 'command.handled';
+    public const FAILED = 'command.failed';
 
     public static function received($command)
     {
@@ -34,9 +34,9 @@ final class CommandEvents
         return self::eventName(self::FAILED, $command);
     }
 
-    private static function eventName($what, $command)
+    private static function eventName(string $what, $command): string
     {
-        return sprintf('%s.%s', $what, is_object($command) ? get_class($command) : (string) $command);
+        return \sprintf('%s.%s', $what, \is_object($command) ? \get_class($command) : (string) $command);
     }
 
     // @codeCoverageIgnoreStart
