@@ -6,13 +6,16 @@
  * that was distributed with this source code.
  */
 
-namespace Chrisguitarguy\Tactician\SymfonyEvents;
+namespace Chrisguitarguy\Tactician\SymfonyEvents\Tests;
 
+use Chrisguitarguy\Tactician\SymfonyEvents\CommandEvents;
+use Chrisguitarguy\Tactician\SymfonyEvents\EventMiddleware;
 use League\Tactician\CommandBus;
+use League\Tactician\Handler\CommandHandlerMiddleware;
 use League\Tactician\Handler\CommandNameExtractor\ClassNameExtractor;
 use League\Tactician\Handler\Locator\InMemoryLocator;
 use League\Tactician\Handler\MethodNameInflector\HandleInflector;
-use League\Tactician\Handler\CommandHandlerMiddleware;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class Command
@@ -31,14 +34,28 @@ interface Handler
  *
  * @since 1.0
  */
-class EventMiddlewareTest extends \PHPUnit_Framework_TestCase
+final class EventMiddlewareTest extends TestCase
 {
     private $dispatcher, $bus, $handler;
 
-    public function testEventMiddlewareFiresGenericReceievedEvent()
+    protected function setUp(): void
+    {
+        $this->dispatcher = new EventDispatcher();
+        $this->handler = $this->createMock(Handler::class);
+        $this->bus = new CommandBus([
+            new EventMiddleware($this->dispatcher),
+            new CommandHandlerMiddleware(
+                new ClassNameExtractor(),
+                new InMemoryLocator([Command::class => $this->handler]),
+                new HandleInflector()
+            ),
+        ]);
+    }
+
+    public function testEventMiddlewareFiresGenericReceievedEvent(): void
     {
         $eventCommand = null;
-        $this->dispatcher->addListener(CommandEvents::RECEIVED, function ($e) use (&$eventCommand) {
+        $this->dispatcher->addListener(CommandEvents::RECEIVED, static function ($e) use (&$eventCommand) {
             $eventCommand = $e->getCommand();
         });
 
@@ -47,10 +64,10 @@ class EventMiddlewareTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($command, $eventCommand);
     }
 
-    public function testEventMiddlewareFiresTheCommandSpecificReceivedEvent()
+    public function testEventMiddlewareFiresTheCommandSpecificReceivedEvent(): void
     {
         $eventCommand = null;
-        $this->dispatcher->addListener(CommandEvents::received(Command::class), function ($e) use (&$eventCommand) {
+        $this->dispatcher->addListener(CommandEvents::received(Command::class), static function ($e) use (&$eventCommand) {
             $eventCommand = $e->getCommand();
         });
 
@@ -59,10 +76,10 @@ class EventMiddlewareTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($command, $eventCommand);
     }
 
-    public function testEventMiddlwareFiresTheGenericHandledEventWithTheCommandAndResult()
+    public function testEventMiddlwareFiresTheGenericHandledEventWithTheCommandAndResult(): void
     {
         $eventCommand = $eventResult = null;
-        $this->dispatcher->addListener(CommandEvents::HANDLED, function ($e) use (&$eventCommand, &$eventResult) {
+        $this->dispatcher->addListener(CommandEvents::HANDLED, static function ($e) use (&$eventCommand, &$eventResult) {
             $eventCommand = $e->getCommand();
             $eventResult = $e->getResult();
         });
@@ -74,11 +91,11 @@ class EventMiddlewareTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($result, $eventResult);
     }
 
-    public function testEventMiddlwareFiresTheSpecificHandledEventWithTheCommandAndResult()
+    public function testEventMiddlwareFiresTheSpecificHandledEventWithTheCommandAndResult(): void
     {
         $eventCommand = $eventResult = null;
         $this->handlerWill($this->returnValue($result = new \stdClass));
-        $this->dispatcher->addListener(CommandEvents::handled(Command::class), function ($e) use (&$eventCommand, &$eventResult) {
+        $this->dispatcher->addListener(CommandEvents::handled(Command::class), static function ($e) use (&$eventCommand, &$eventResult) {
             $eventCommand = $e->getCommand();
             $eventResult = $e->getResult();
         });
@@ -89,7 +106,7 @@ class EventMiddlewareTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($result, $eventResult);
     }
 
-    public function testEventMiddlewareFiresTheGenericFailedEventWithTheException()
+    public function testEventMiddlewareFiresTheGenericFailedEventWithTheException(): void
     {
         $eventCommand = null;
         $this->handlerWill($this->throwException($ex = new \LogicException('oops')));
@@ -112,7 +129,7 @@ class EventMiddlewareTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($caught, 'should have caught the LogicException above');
     }
 
-    public function testEventMiddlewareFiresTheSpecificFailedEventWithTheException()
+    public function testEventMiddlewareFiresTheSpecificFailedEventWithTheException(): void
     {
         $eventCommand = null;
         $this->handlerWill($this->throwException($ex = new \LogicException('oops')));
@@ -135,21 +152,7 @@ class EventMiddlewareTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($caught, 'should have caught the LogicException above');
     }
 
-    protected function setUp()
-    {
-        $this->dispatcher = new EventDispatcher();
-        $this->handler = $this->getMock(Handler::class);
-        $this->bus = new CommandBus([
-            new EventMiddleware($this->dispatcher),
-            new CommandHandlerMiddleware(
-                new ClassNameExtractor(),
-                new InMemoryLocator([Command::class => $this->handler]),
-                new HandleInflector()
-            ),
-        ]);
-    }
-
-    private function handlerWill($action)
+    private function handlerWill($action): void
     {
         $this->handler->expects($this->once())
             ->method('handle')
