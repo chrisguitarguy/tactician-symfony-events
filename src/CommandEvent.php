@@ -8,7 +8,7 @@
 
 namespace Chrisguitarguy\Tactician\SymfonyEvents;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * ABC for command events. Provides the getter for the command.

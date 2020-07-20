@@ -43,7 +43,7 @@ final class EventMiddleware implements Middleware
             $this->dispatch(CommandEvents::handled($command), new CommandHandled($command, $result));
 
             return $result;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->dispatch(CommandEvents::FAILED, new CommandFailed($command, $e));
             $this->dispatch(CommandEvents::failed($command), new CommandFailed($command, $e));
 
@@ -51,8 +51,8 @@ final class EventMiddleware implements Middleware
         }
     }
 
-    private function dispatch($eventName, CommandEvent $event)
+    private function dispatch($eventName, CommandEvent $event): void
     {
-        $this->dispatcher->dispatch($eventName, $event);
+        $this->dispatcher->dispatch($event, $eventName);
     }
 }
