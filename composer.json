@@ -14,13 +14,13 @@
         "symfony"
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2 || ^8.0",
         "league/tactician": "^1.0",
-        "symfony/event-dispatcher": "^4.4 || ^5.0"
+        "symfony/event-dispatcher": "^4.4 || ^5.0 || ^6.0"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-master",
-        "phpunit/phpunit": "^8.5"
+        "roave/security-advisories": "dev-latest",
+        "phpunit/phpunit": "^8.5 || ^9.5"
     },
     "autoload": {
         "psr-4": {
